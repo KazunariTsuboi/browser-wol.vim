@@ -74,7 +74,7 @@ function! wolbrw#make_windows_UnHistory() abort
     endif
 endfunction
 
-function! wolbrw#ParseFlags(arg_list) abort
+function! wolbrw#ParseFlags(arg_list, arg_mord) abort
   let text = []
   let scope = 'par'
   let order = 'occ'
@@ -103,12 +103,18 @@ function! wolbrw#ParseFlags(arg_list) abort
       call add(text, arg)
     endif
   endfor
-  return {'text': join(text, '&'), 'scope': scope, 'order': order}
+
+  if a:arg_mord == 'search_simple'
+    return {'text': join(text, '&'), 'scope': scope, 'order': order}
+  elseif a:arg_mord == 'search_mean'
+    let text = wolbrw#getSelectedText()
+    return {'text': text, 'scope': scope, 'order': order}
+  endif
 endfunction
 
 function! wolbrw#make_windows_from_command(...) abort
   let g:wolbrw_current_window_id = win_getid()
-  let flags = wolbrw#ParseFlags(a:000)
+  let flags = wolbrw#ParseFlags(a:000, 'search_simple')
     echo flags
 
     call wolbrw#lock_unlock_window(g:wolbrw_list_buffer, 'unlock')
@@ -117,6 +123,21 @@ function! wolbrw#make_windows_from_command(...) abort
     python3 scope = vim.eval("flags['scope']")
     python3 order = vim.eval("flags['order']")
     python3 vim.command(f'let s:result = {wolbrw_search(text=text,scope=scope,order=order)}')
+    call wolbrw#make_windows(s:result)
+    call wolbrw#AddToHistory(s:result)
+endfunction
+
+function! wolbrw#make_windows_mean_search(...) abort
+  let g:wolbrw_current_window_id = win_getid()
+  let flags = wolbrw#ParseFlags(a:000, 'search_mean')
+    echo flags
+
+    call wolbrw#lock_unlock_window(g:wolbrw_list_buffer, 'unlock')
+    " 現在のウィンドウIDの取得
+    python3 text = vim.eval("flags['text']")
+    python3 scope = vim.eval("flags['scope']")
+    python3 order = vim.eval("flags['order']")
+    python3 vim.command(f'let s:result = {wolbrw_mean_search(text=text,scope=scope,order=order)}')
     call wolbrw#make_windows(s:result)
     call wolbrw#AddToHistory(s:result)
 endfunction

@@ -15,3 +15,4 @@ let g:loaded_wolbrw = 1
 "command! -nargs=1 SessionCreate call session#create_session(<q-args>)
 
 command! -nargs=* WOLSearch call wolbrw#make_windows_from_command(<f-args>)
+command! -nargs=* WOLSearchMean call wolbrw#make_windows_mean_search(<f-args>)
