@@ -105,7 +105,7 @@ function! wolbrw#ParseFlags(arg_list, arg_mord) abort
   endfor
 
   if a:arg_mord == 'search_simple'
-    return {'text': join(text, '&'), 'scope': scope, 'order': order}
+    return {'text': join(text, ' '), 'scope': scope, 'order': order}
   elseif a:arg_mord == 'search_mean'
     let text = wolbrw#getSelectedText()
     return {'text': text, 'scope': scope, 'order': order}
